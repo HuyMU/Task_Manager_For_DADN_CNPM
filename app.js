@@ -45,7 +45,7 @@ app.post('/api/auth/register', async (req, res) => {
     
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        await pool.query('INSERT INTO users (username, password, role, custom_role_id) VALUES (?, ?, "member", ?)', 
+        await pool.query('INSERT INTO users (username, password, role, custom_role_id) VALUES (?, ?, \'member\', ?)', 
             [username, hashedPassword, custom_role_id]);
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
@@ -115,7 +115,7 @@ app.post('/tasks', verifyToken, isAdmin, async (req, res) => {
     try {
         const targetRoleId = assigned_role_id || null;
         const [result] = await pool.query(
-            'INSERT INTO tasks (title, description, assigned_role_id, status) VALUES (?, ?, ?, COALESCE(?, "pending"))',
+            'INSERT INTO tasks (title, description, assigned_role_id, status) VALUES (?, ?, ?, COALESCE(?, \'pending\'))',
             [title, description, targetRoleId, status]
         );
         res.status(201).json({ message: 'Task created successfully', taskId: result.insertId });
