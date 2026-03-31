@@ -40,6 +40,7 @@ async function setupDatabase() {
                 password VARCHAR(255) NOT NULL,
                 role ENUM('admin', 'member') DEFAULT 'member',
                 custom_role_id INT,
+                is_reviewer BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (custom_role_id) REFERENCES custom_roles(id) ON DELETE SET NULL
             );
@@ -53,7 +54,9 @@ async function setupDatabase() {
                 title VARCHAR(255) NOT NULL,
                 description TEXT,
                 assigned_role_id INT,
-                status ENUM('pending', 'in_progress', 'completed') DEFAULT 'pending',
+                status ENUM('pending', 'in_progress', 'pending_review', 'completed') DEFAULT 'pending',
+                due_date DATETIME,
+                evidence_note TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (assigned_role_id) REFERENCES custom_roles(id) ON DELETE SET NULL

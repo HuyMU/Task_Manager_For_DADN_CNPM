@@ -76,7 +76,8 @@ app.post('/api/auth/login', async (req, res) => {
             username: user.username, 
             role: user.role,
             custom_role_id: user.custom_role_id,
-            custom_role_name: user.custom_role_name
+            custom_role_name: user.custom_role_name,
+            is_reviewer: user.is_reviewer
         }, JWT_SECRET, { expiresIn: '1d' });
         
         res.json({ 
@@ -84,10 +85,41 @@ app.post('/api/auth/login', async (req, res) => {
             role: user.role, 
             username: user.username, 
             custom_role_id: user.custom_role_id,
-            custom_role_name: user.custom_role_name
+            custom_role_name: user.custom_role_name,
+            is_reviewer: user.is_reviewer
         });
     } catch (error) {
         console.error('Error logging in:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// --- USER MANAGEMENT ROUTES ---
+app.get('/api/users', verifyToken, isAdmin, async (req, res) => {
+    try {
+        const query = `
+            SELECT u.id, u.username, u.role, u.is_reviewer, r.name as custom_role_name 
+            FROM users u 
+            LEFT JOIN custom_roles r ON u.custom_role_id = r.id 
+            WHERE u.role = 'member'
+            ORDER BY u.username
+        `;
+        const [rows] = await pool.query(query);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.put('/api/users/:id/reviewer', verifyToken, isAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { is_reviewer } = req.body;
+    try {
+        await pool.query('UPDATE users SET is_reviewer = ? WHERE id = ?', [is_reviewer ? 1 : 0, id]);
+        res.json({ message: 'Reviewer status updated' });
+    } catch (error) {
+        console.error('Error updating reviewer status:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
@@ -109,14 +141,15 @@ app.get('/tasks', verifyToken, async (req, res) => {
 });
 
 app.post('/tasks', verifyToken, isAdmin, async (req, res) => {
-    const { title, description, assigned_role_id, status } = req.body;
+    const { title, description, assigned_role_id, status, due_date } = req.body;
     if (!title) return res.status(400).json({ error: 'Title is required' });
 
     try {
         const targetRoleId = assigned_role_id || null;
+        const targetDueDate = due_date || null;
         const [result] = await pool.query(
-            'INSERT INTO tasks (title, description, assigned_role_id, status) VALUES (?, ?, ?, COALESCE(?, \'pending\'))',
-            [title, description, targetRoleId, status]
+            'INSERT INTO tasks (title, description, assigned_role_id, status, due_date) VALUES (?, ?, ?, COALESCE(?, \'pending\'), ?)',
+            [title, description, targetRoleId, status, targetDueDate]
         );
         res.status(201).json({ message: 'Task created successfully', taskId: result.insertId });
     } catch (error) {
@@ -127,7 +160,7 @@ app.post('/tasks', verifyToken, isAdmin, async (req, res) => {
 
 app.put('/tasks/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
-    const { title, description, assigned_role_id, status } = req.body;
+    const { title, description, assigned_role_id, status, due_date } = req.body;
     
     try {
         const [tasks] = await pool.query('SELECT assigned_role_id FROM tasks WHERE id = ?', [id]);
@@ -137,8 +170,8 @@ app.put('/tasks/:id', verifyToken, async (req, res) => {
         if (req.user.role === 'admin') {
             const targetRoleId = assigned_role_id === undefined ? task.assigned_role_id : (assigned_role_id || null);
             await pool.query(
-                'UPDATE tasks SET title = COALESCE(?, title), description = COALESCE(?, description), assigned_role_id = ?, status = COALESCE(?, status) WHERE id = ?',
-                [title, description, targetRoleId, status, id]
+                'UPDATE tasks SET title = COALESCE(?, title), description = COALESCE(?, description), assigned_role_id = ?, status = COALESCE(?, status), due_date = COALESCE(?, due_date) WHERE id = ?',
+                [title, description, targetRoleId, status, due_date, id]
             );
             res.json({ message: 'Task updated successfully' });
         } else {
@@ -153,6 +186,61 @@ app.put('/tasks/:id', verifyToken, async (req, res) => {
         }
     } catch (error) {
         console.error('Error updating task:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.put('/tasks/:id/request-review', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const { evidence_note } = req.body;
+
+    try {
+        const [tasks] = await pool.query('SELECT assigned_role_id FROM tasks WHERE id = ?', [id]);
+        if (tasks.length === 0) return res.status(404).json({ error: 'Task not found' });
+        const task = tasks[0];
+
+        if (req.user.role !== 'admin' && task.assigned_role_id !== null && task.assigned_role_id !== req.user.custom_role_id) {
+            return res.status(403).json({ error: 'You are not allowed to submit this task for review' });
+        }
+
+        await pool.query(
+            'UPDATE tasks SET status = \'pending_review\', evidence_note = ? WHERE id = ?',
+            [evidence_note || null, id]
+        );
+        res.json({ message: 'Task submitted for review' });
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.put('/tasks/:id/review', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    const { action } = req.body;
+
+    try {
+        const [tasks] = await pool.query('SELECT assigned_role_id FROM tasks WHERE id = ?', [id]);
+        if (tasks.length === 0) return res.status(404).json({ error: 'Task not found' });
+        const task = tasks[0];
+
+        const isSelfRoleTask = (task.assigned_role_id !== null && task.assigned_role_id === req.user.custom_role_id);
+        const canReview = req.user.role === 'admin' || (req.user.is_reviewer && !isSelfRoleTask);
+
+        if (!canReview) {
+            return res.status(403).json({ error: 'You are not allowed to review this task' });
+        }
+
+        if (action === 'approve') {
+            await pool.query('UPDATE tasks SET status = \'completed\' WHERE id = ?', [id]);
+            res.json({ message: 'Task approved' });
+        } else if (action === 'reject') {
+            await pool.query('UPDATE tasks SET status = \'in_progress\', evidence_note = NULL WHERE id = ?', [id]);
+            res.json({ message: 'Task rejected' });
+        } else {
+            res.status(400).json({ error: 'Invalid action. Use "approve" or "reject".' });
+        }
+    } catch (error) {
+        console.error('Error reviewing task:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });

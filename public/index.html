@@ -79,29 +79,39 @@
         <!-- ======================= -->
         <div id="dashboard-section" class="hidden">
             <!-- Header -->
-            <header class="mb-10 flex items-center justify-between border-b border-indigo-100 pb-6">
+            <header class="mb-10 flex flex-col md:flex-row md:items-center justify-between border-b border-indigo-100 pb-6 gap-4">
                 <div>
                     <h1 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">Taskboard</h1>
                     <p class="text-slate-500 mt-2 font-medium">Manage your team's workflow</p>
                 </div>
+                
+                <!-- Admin Navigation Tabs -->
+                <nav id="admin-nav" class="hidden flex items-center gap-2 bg-slate-100/50 p-1.5 rounded-xl border border-slate-200/60 shadow-inner">
+                    <button onclick="switchTab('board')" id="tab-board" class="px-5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-white shadow-sm transition-all focus:outline-none">Kanban Board</button>
+                    <button onclick="switchTab('settings')" id="tab-settings" class="px-5 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 transition-all focus:outline-none">Workspace Settings</button>
+                </nav>
+
                 <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <p class="text-sm text-slate-500">Logged in as</p>
-                        <p id="current-username" class="font-bold text-indigo-700"></p>
+                    <button id="open-task-modal-btn" onclick="openTaskModal()" class="hidden bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all focus:outline-none transform hover:-translate-y-0.5 whitespace-nowrap">
+                        <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        New Task
+                    </button>
+                    <div class="text-right ml-4 border-l border-slate-200 pl-4 hidden md:block">
+                        <p class="text-xs text-slate-500">Logged in as</p>
+                        <p id="current-username" class="font-bold text-indigo-700 leading-tight"></p>
                     </div>
-                    <button id="logout-btn" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl font-semibold shadow-sm transition-colors">
+                    <button id="logout-btn" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl font-semibold shadow-sm transition-colors focus:outline-none shrink-0">
                         Logout
                     </button>
                 </div>
             </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div id="main-content">
                 
-                <!-- Left Sidebar (Admin Only) -->
-                <div id="admin-sidebar" class="hidden lg:col-span-1 border-r border-slate-200/60 pr-0 lg:pr-8 space-y-6">
-                    
+                <!-- SETTINGS VIEW (Admin Only) -->
+                <div id="settings-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto align-top">
                     <!-- Add Role Form -->
-                    <div class="glass-panel rounded-2xl p-6 shadow-sm">
+                    <div class="glass-panel rounded-2xl p-6 shadow-sm h-fit">
                         <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-900 border-b border-indigo-100 pb-2">
                             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                             Create Role
@@ -116,36 +126,20 @@
                         </form>
                     </div>
 
-                    <!-- Add Task Form -->
-                    <div class="glass-panel rounded-2xl p-6 shadow-sm sticky top-10">
-                        <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-indigo-900 border-b border-indigo-100 pb-3">
-                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                            New Task
+                    <!-- Manage Reviewers -->
+                    <div class="glass-panel rounded-2xl p-6 shadow-sm h-fit">
+                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-900 border-b border-indigo-100 pb-2">
+                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            Manage Reviewers
                         </h2>
-                        <form id="task-form" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Title <span class="text-red-500">*</span></label>
-                                <input type="text" id="title" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none placeholder-slate-400" placeholder="E.g., Design homepage">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Description</label>
-                                <textarea id="description" rows="3" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none resize-none placeholder-slate-400" placeholder="Task details..."></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Assign to Role</label>
-                                <select id="assigned_role_id" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
-                                    <option value="">Unassigned</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:shadow-lg transition-transform transform hover:-translate-y-0.5 mt-2">
-                                Create Task
-                            </button>
-                        </form>
+                        <div id="users-list" class="space-y-2 mt-3 max-h-64 overflow-y-auto pr-1">
+                            <p class="text-xs text-slate-500 italic">No members found.</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Right Column: Task Board -->
-                <div id="board-container" class="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6 transition-all relative">
+                <!-- BOARD VIEW -->
+                <div id="board-container" class="grid grid-cols-1 md:grid-cols-4 gap-6 transition-all relative">
                     
                     <!-- Admin Warning Message Placeholder -->
                     <div id="no-roles-warning" class="absolute -top-12 left-0 right-0 bg-yellow-50 text-yellow-800 p-3 rounded-lg border border-yellow-200 text-sm hidden font-medium">
@@ -176,6 +170,18 @@
                         <div id="col-in_progress" class="flex-1 space-y-4 min-h-[200px]"></div>
                     </div>
 
+                    <!-- Pending Review Column -->
+                    <div class="flex flex-col rounded-2xl bg-slate-100/50 border border-slate-200/50 p-4 shadow-inner">
+                        <div class="flex items-center justify-between mb-4 px-2 py-2 border-b border-purple-200/50 bg-purple-50/50 rounded-lg">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-md shadow-purple-500/50"></span>
+                                Review
+                            </h3>
+                            <span id="count-pending_review" class="text-sm font-bold bg-white py-1 px-3 rounded-full text-purple-600 shadow-sm border border-purple-100">0</span>
+                        </div>
+                        <div id="col-pending_review" class="flex-1 space-y-4 min-h-[200px]"></div>
+                    </div>
+
                     <!-- Completed Column -->
                     <div class="flex flex-col rounded-2xl bg-slate-100/50 border border-slate-200/50 p-4 shadow-inner">
                         <div class="flex items-center justify-between mb-4 px-2 py-2 border-b border-emerald-200/50 bg-emerald-50/50 rounded-lg">
@@ -189,6 +195,46 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- Task Modal (Hidden) -->
+        <div id="task-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0 duration-300">
+            <div class="glass-panel w-full max-w-lg mx-4 rounded-2xl shadow-2xl p-6 relative transform transition-transform scale-95 opacity-0 duration-300 flex flex-col max-h-[90vh]" id="task-modal-content">
+                <button type="button" onclick="closeTaskModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors focus:outline-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-indigo-900 border-b border-indigo-100 pb-3 shrink-0">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    New Task
+                </h2>
+                
+                <div class="overflow-y-auto pr-2 pb-2">
+                    <form id="task-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Title <span class="text-red-500">*</span></label>
+                            <input type="text" id="title" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none placeholder-slate-400" placeholder="E.g., Design homepage">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Description</label>
+                            <textarea id="description" rows="3" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none resize-none placeholder-slate-400" placeholder="Task details..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Deadline <span class="text-red-500">*</span></label>
+                            <input type="datetime-local" id="due_date" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Assign to Role</label>
+                            <select id="assigned_role_id" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+                                <option value="">Unassigned</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:shadow-lg transition-transform transform hover:-translate-y-0.5 mt-2">
+                            Create Task
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -207,7 +253,8 @@
             token: localStorage.getItem('token') || null,
             role: localStorage.getItem('role') || null,
             username: localStorage.getItem('username') || null,
-            custom_role_id: parseInt(localStorage.getItem('custom_role_id')) || null
+            custom_role_id: parseInt(localStorage.getItem('custom_role_id')) || null,
+            is_reviewer: localStorage.getItem('is_reviewer') === '1'
         };
 
         // DOM Elements
@@ -222,10 +269,18 @@
         const authRoleSelect = document.getElementById('auth-role');
         const logoutBtn = document.getElementById('logout-btn');
         
-        const adminSidebar = document.getElementById('admin-sidebar');
+        const adminNav = document.getElementById('admin-nav');
+        const openTaskModalBtn = document.getElementById('open-task-modal-btn');
+        const settingsContainer = document.getElementById('settings-container');
         const boardContainer = document.getElementById('board-container');
         const roleSelect = document.getElementById('assigned_role_id');
         const noRolesWarning = document.getElementById('no-roles-warning');
+        
+        const taskModal = document.getElementById('task-modal');
+        const taskModalContent = document.getElementById('task-modal-content');
+        
+        const tabBoardBtn = document.getElementById('tab-board');
+        const tabSettingsBtn = document.getElementById('tab-settings');
 
         // Headers Helper
         function getHeaders() {
@@ -243,15 +298,16 @@
                 document.getElementById('current-username').textContent = `${authState.username} (${authState.role})`;
                 
                 if(authState.role === 'admin') {
-                    adminSidebar.classList.remove('hidden');
-                    boardContainer.classList.remove('lg:col-span-4');
-                    boardContainer.classList.add('lg:col-span-3');
+                    adminNav.classList.remove('hidden');
+                    openTaskModalBtn.classList.remove('hidden');
+                    switchTab('board'); // Default tab
                     await fetchRolesForAdmin();
+                    fetchUsersForAdmin();
                 } else {
-                    // Members see board full width
-                    adminSidebar.classList.add('hidden');
-                    boardContainer.classList.remove('lg:col-span-3');
-                    boardContainer.classList.add('lg:col-span-4');
+                    adminNav.classList.add('hidden');
+                    openTaskModalBtn.classList.add('hidden');
+                    settingsContainer.classList.add('hidden');
+                    boardContainer.classList.remove('hidden');
                 }
                 fetchTasks();
             } else {
@@ -260,6 +316,42 @@
                 fetchRolesForRegistration();
             }
         }
+
+        // Modal & Tab Logic
+        window.openTaskModal = function() {
+            taskModal.classList.remove('hidden');
+            setTimeout(() => {
+                taskModal.classList.remove('opacity-0');
+                taskModalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+
+        window.closeTaskModal = function() {
+            taskModal.classList.add('opacity-0');
+            taskModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => taskModal.classList.add('hidden'), 300);
+        }
+
+        window.switchTab = function(tabName) {
+            if (tabName === 'board') {
+                boardContainer.classList.remove('hidden');
+                settingsContainer.classList.add('hidden');
+                
+                tabBoardBtn.className = 'px-5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-white shadow-sm transition-all focus:outline-none';
+                tabSettingsBtn.className = 'px-5 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 transition-all focus:outline-none';
+            } else if (tabName === 'settings') {
+                boardContainer.classList.add('hidden');
+                settingsContainer.classList.remove('hidden');
+                
+                tabSettingsBtn.className = 'px-5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-white shadow-sm transition-all focus:outline-none';
+                tabBoardBtn.className = 'px-5 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 transition-all focus:outline-none';
+            }
+        }
+
+        // Drop Modal on outside click
+        taskModal.addEventListener('click', (e) => {
+            if (e.target === taskModal) closeTaskModal();
+        });
 
         // Toggle Auth Mode
         toggleAuthBtnEl.addEventListener('click', () => {
@@ -320,6 +412,9 @@
                     localStorage.setItem('role', data.role);
                     localStorage.setItem('username', data.username);
                     if(data.custom_role_id) localStorage.setItem('custom_role_id', data.custom_role_id);
+                    if(data.is_reviewer) localStorage.setItem('is_reviewer', '1'); else localStorage.removeItem('is_reviewer');
+                    
+                    authState.is_reviewer = !!data.is_reviewer;
                     
                     authForm.reset();
                     initApp();
@@ -378,6 +473,49 @@
             } catch (e) { console.error('Failed fetching roles', e); }
         }
 
+        // Fetch Users (Admin Sidebar)
+        async function fetchUsersForAdmin() {
+            try {
+                const res = await fetch('/api/users', { headers: getHeaders() });
+                if(res.ok) {
+                    const users = await res.json();
+                    const container = document.getElementById('users-list');
+                    if(users.length === 0) {
+                        container.innerHTML = '<p class="text-xs text-slate-500 italic">No members found.</p>';
+                        return;
+                    }
+                    container.innerHTML = '';
+                    users.forEach(u => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center justify-between p-2 hover:bg-white/50 rounded-lg border border-transparent hover:border-indigo-100 transition-colors cursor-default text-sm';
+                        div.innerHTML = `
+                            <div class="flex flex-col truncate pr-2">
+                                <span class="font-bold text-slate-700 truncate">${u.username}</span>
+                                <span class="text-[10px] text-slate-500 uppercase tracking-wide truncate">${u.custom_role_name || 'No Role'}</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input type="checkbox" class="sr-only peer" ${u.is_reviewer ? 'checked' : ''} onchange="toggleReviewer(${u.id}, this.checked)">
+                                <div class="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-500"></div>
+                            </label>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
+            } catch(e) { console.error('Error fetching users', e); }
+        }
+
+        window.toggleReviewer = async function(id, is_reviewer) {
+            try {
+                await fetch(`/api/users/${id}/reviewer`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ is_reviewer })
+                });
+            } catch (error) {
+                console.error('Error toggling reviewer:', error);
+            }
+        }
+
         // Create Custom Role
         document.getElementById('role-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -429,40 +567,95 @@
             const columns = {
                 pending: document.getElementById('col-pending'),
                 in_progress: document.getElementById('col-in_progress'),
+                pending_review: document.getElementById('col-pending_review'),
                 completed: document.getElementById('col-completed')
             };
 
-            const counts = { pending: 0, in_progress: 0, completed: 0 };
+            const counts = { pending: 0, in_progress: 0, pending_review: 0, completed: 0 };
             Object.values(columns).forEach(col => col.innerHTML = '');
 
             tasks.forEach(task => {
                 const status = task.status || 'pending';
                 if(columns[status]) {
                     const card = document.createElement('div');
-                    card.className = "task-card-enter bg-white p-5 rounded-xl text-left border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 group hover:-translate-y-1 relative";
+                    card.className = "task-card-enter bg-white p-5 rounded-xl text-left border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 group hover:-translate-y-1 relative flex flex-col";
                     
-                    const nextStatusMap = {
-                        'pending': 'in_progress',
-                        'in_progress': 'completed',
-                        'completed': 'pending'
-                    };
+                    let deadlineHtml = '';
+                    if (task.due_date) {
+                        const dueDate = new Date(task.due_date);
+                        const now = new Date();
+                        const diffHours = (dueDate - now) / (1000 * 60 * 60);
+                        const isOverdue = dueDate < now && status !== 'completed';
+                        const dateStr = dueDate.toLocaleString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
+                        
+                        let deadlineColorClass = 'text-slate-500';
+                        if (status !== 'completed') {
+                            if (diffHours < 0) {
+                                deadlineColorClass = 'text-red-600 animate-pulse font-bold';
+                            } else if (diffHours < 24) {
+                                deadlineColorClass = 'text-orange-500 font-bold';
+                            } else if (diffHours < 72) {
+                                deadlineColorClass = 'text-amber-500 font-bold';
+                            } else {
+                                deadlineColorClass = 'text-emerald-500 font-bold';
+                            }
+                        }
 
-                    const actionBtnLabel = status === 'pending' ? 'Start' : (status === 'in_progress' ? 'Complete' : 'Reopen');
-                    let actionBtnColor = status === 'pending' 
-                        ? 'text-blue-700 bg-blue-50 hover:bg-blue-100 border-blue-200' 
-                        : (status === 'in_progress' ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-amber-700 bg-amber-50 hover:bg-amber-100 border-amber-200');
+                        deadlineHtml = `
+                            <div class="text-xs font-semibold mb-2 flex items-center gap-1 ${deadlineColorClass}">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="truncate">${isOverdue ? 'Overdue: ' : 'Deadline: '} ${dateStr}</span>
+                            </div>
+                        `;
+                    }
 
-                    // Check if member is allowed to interact
-                    const isUnassigned = task.assigned_role_id === null;
-                    const matchesRole = task.assigned_role_id === authState.custom_role_id;
-                    const canEdit = authState.role === 'admin' || isUnassigned || matchesRole;
+                    let evidenceHtml = '';
+                    if (task.evidence_note) {
+                        evidenceHtml = `<div class="mt-2 text-xs bg-indigo-50 p-2 rounded-md border border-indigo-100 text-indigo-800 break-words mb-2"><b>Evidence:</b> ${task.evidence_note}</div>`;
+                    }
 
-                    let actionBtnAttributes = '';
-                    if(!canEdit) {
-                        actionBtnColor = 'text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed opacity-50';
-                        actionBtnAttributes = 'disabled title="You do not have the role to update this task"';
+                    let actionBtnHtml = '';
+                    
+                    if (status === 'pending_review') {
+                        const isSelfRoleTask = (task.assigned_role_id !== null && task.assigned_role_id === authState.custom_role_id);
+                        const canReview = authState.role === 'admin' || (authState.is_reviewer && !isSelfRoleTask);
+                        
+                        if (canReview) {
+                            actionBtnHtml = `
+                                <div class="flex flex-wrap gap-2 shrink-0 justify-end">
+                                    <button onclick="reviewTask(${task.id}, 'approve')" class="text-xs font-bold px-3 py-1.5 rounded-lg border shadow-sm text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200">Approve</button>
+                                    <button onclick="reviewTask(${task.id}, 'reject')" class="text-xs font-bold px-3 py-1.5 rounded-lg border shadow-sm text-red-700 bg-red-50 hover:bg-red-100 border-red-200">Reject</button>
+                                </div>
+                            `;
+                        } else {
+                            actionBtnHtml = `<span class="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1.5 rounded-md border border-purple-200 shrink-0 select-none">⏳ Đang chờ duyệt</span>`;
+                        }
                     } else {
-                        actionBtnAttributes = `onclick="updateTaskStatus(${task.id}, '${nextStatusMap[status]}')"`;
+                        const actionBtnLabel = status === 'pending' ? 'Start' : (status === 'in_progress' ? (authState.role === 'admin' ? 'Complete' : 'Submit Review') : 'Reopen');
+                        let actionBtnColor = status === 'pending' 
+                            ? 'text-blue-700 bg-blue-50 hover:bg-blue-100 border-blue-200' 
+                            : (status === 'in_progress' ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-amber-700 bg-amber-50 hover:bg-amber-100 border-amber-200');
+
+                        const isUnassigned = task.assigned_role_id === null;
+                        const matchesRole = task.assigned_role_id === authState.custom_role_id;
+                        const canEdit = authState.role === 'admin' || isUnassigned || matchesRole;
+
+                        if(!canEdit) {
+                            actionBtnColor = 'text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed opacity-50';
+                            actionBtnHtml = `<button disabled title="You do not have the role to update this task" class="text-xs font-bold px-3 py-1.5 rounded-lg border shadow-sm ${actionBtnColor}">${actionBtnLabel}</button>`;
+                        } else {
+                            if (status === 'in_progress' && authState.role !== 'admin') {
+                                actionBtnHtml = `<button onclick="requestReviewTask(${task.id})" class="text-xs font-bold px-3 py-1.5 rounded-lg border shadow-sm ${actionBtnColor}">${actionBtnLabel}</button>`;
+                            } else {
+                                const nextStatusMap = {
+                                    'pending': 'in_progress',
+                                    'in_progress': 'completed',
+                                    'completed': 'pending'
+                                };
+                                const actualNextStatus = nextStatusMap[status];
+                                actionBtnHtml = `<button onclick="updateTaskStatus(${task.id}, '${actualNextStatus}')" class="text-xs font-bold px-3 py-1.5 rounded-lg border shadow-sm ${actionBtnColor}">${actionBtnLabel}</button>`;
+                            }
+                        }
                     }
 
                     // Only Admins can delete
@@ -477,22 +670,24 @@
                     const startLetter = task.assigned_role_name ? task.assigned_role_name.charAt(0).toUpperCase() : '?';
 
                     card.innerHTML = `
+                        ${deadlineHtml}
                         <div class="flex justify-between items-start mb-3">
                             <h4 class="font-bold text-slate-800 leading-tight pr-6">${task.title}</h4>
                             ${deleteBtnHtml}
                         </div>
-                        ${task.description ? `<p class="text-sm text-slate-600 mb-5 line-clamp-3 leading-relaxed">${task.description}</p>` : '<div class="mb-5"></div>'}
+                        ${task.description ? `<p class="text-sm text-slate-600 mb-3 line-clamp-3 leading-relaxed">${task.description}</p>` : '<div class="mb-3"></div>'}
+                        ${evidenceHtml}
                         
-                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-100 to-purple-200 flex items-center justify-center text-xs font-bold text-indigo-700 ring-2 ring-white shadow-sm" title="Role: ${task.assigned_role_name || 'Unassigned'}">
+                        <div class="flex flex-wrap items-center justify-between gap-y-3 mt-auto pt-4 border-t border-slate-100">
+                            <div class="flex items-center gap-2.5 shrink-0 max-w-1/2 pr-2">
+                                <div class="w-7 h-7 shrink-0 rounded-full bg-gradient-to-br from-indigo-100 to-purple-200 flex items-center justify-center text-xs font-bold text-indigo-700 ring-2 ring-white shadow-sm" title="Role: ${task.assigned_role_name || 'Unassigned'}">
                                     ${startLetter}
                                 </div>
-                                <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">${task.assigned_role_name || 'Unassigned'}</span>
+                                <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200 truncate max-w-[80px]" title="${task.assigned_role_name || 'Unassigned'}">${task.assigned_role_name || 'Unassigned'}</span>
                             </div>
-                            <button ${actionBtnAttributes} class="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border shadow-sm ${actionBtnColor}">
-                                ${actionBtnLabel}
-                            </button>
+                            <div class="shrink-0 flex items-center justify-end">
+                                ${actionBtnHtml}
+                            </div>
                         </div>
                     `;
                     columns[status].appendChild(card);
@@ -502,6 +697,7 @@
 
             document.getElementById('count-pending').textContent = counts.pending;
             document.getElementById('count-in_progress').textContent = counts.in_progress;
+            document.getElementById('count-pending_review').textContent = counts.pending_review;
             document.getElementById('count-completed').textContent = counts.completed;
         }
 
@@ -516,6 +712,7 @@
                 title: document.getElementById('title').value,
                 description: document.getElementById('description').value,
                 assigned_role_id: document.getElementById('assigned_role_id').value || null,
+                due_date: document.getElementById('due_date').value || null,
                 status: 'pending'
             };
 
@@ -527,6 +724,7 @@
                 });
                 if(res.ok) {
                     e.target.reset();
+                    closeTaskModal();
                     await fetchTasks();
                 } else {
                     const data = await res.json();
@@ -556,6 +754,38 @@
                 }
             } catch (error) {
                 console.error('Error updating task:', error);
+            }
+        }
+
+        // Request Review (Member)
+        window.requestReviewTask = async function(id) {
+            const note = prompt('Bạn đã hoàn thành? Vui lòng gửi kèm Link kết quả hoặc báo cáo ngắn (Evidence):', '');
+            if (note === null) return; // User cancelled
+            try {
+                const res = await fetch(`${API_TASKS}/${id}/request-review`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ evidence_note: note })
+                });
+                if(res.ok) fetchTasks();
+                else alert((await res.json()).error);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Review Task (Admin)
+        window.reviewTask = async function(id, action) {
+            try {
+                const res = await fetch(`${API_TASKS}/${id}/review`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ action: action })
+                });
+                if(res.ok) fetchTasks();
+                else alert((await res.json()).error);
+            } catch (error) {
+                console.error(error);
             }
         }
 
