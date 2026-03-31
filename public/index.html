@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Task Manager</title>
+    <!-- Use Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .task-card-enter {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen text-slate-800 p-6 md:p-10">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- ======================= -->
+        <!--      AUTH SECTION       -->
+        <!-- ======================= -->
+        <div id="auth-section" class="flex items-center justify-center min-h-[80vh]">
+            <div class="glass-panel p-8 rounded-2xl shadow-xl w-full max-w-md">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">Taskboard</h1>
+                    <p class="text-slate-500 mt-2 font-medium" id="auth-subtitle">Welcome back! Please login.</p>
+                </div>
+                
+                <form id="auth-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Username</label>
+                        <input type="text" id="auth-username" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+                        <input type="password" id="auth-password" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+                    </div>
+                    <div id="auth-role-wrapper" class="hidden">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Select Your Role</label>
+                        <select id="auth-role" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+                            <option value="">-- Choose Role --</option>
+                        </select>
+                    </div>
+                    
+                    <div id="auth-error" class="text-red-500 text-sm hidden font-medium"></div>
+
+                    <button type="submit" id="auth-submit-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:shadow-lg transition-transform transform hover:-translate-y-0.5 mt-2">
+                        Login
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <button type="button" id="toggle-auth-btn" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors">
+                            Need an account? Register here.
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- ======================= -->
+        <!--    DASHBOARD SECTION    -->
+        <!-- ======================= -->
+        <div id="dashboard-section" class="hidden">
+            <!-- Header -->
+            <header class="mb-10 flex items-center justify-between border-b border-indigo-100 pb-6">
+                <div>
+                    <h1 class="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">Taskboard</h1>
+                    <p class="text-slate-500 mt-2 font-medium">Manage your team's workflow</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-sm text-slate-500">Logged in as</p>
+                        <p id="current-username" class="font-bold text-indigo-700"></p>
+                    </div>
+                    <button id="logout-btn" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl font-semibold shadow-sm transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                
+                <!-- Left Sidebar (Admin Only) -->
+                <div id="admin-sidebar" class="hidden lg:col-span-1 border-r border-slate-200/60 pr-0 lg:pr-8 space-y-6">
+                    
+                    <!-- Add Role Form -->
+                    <div class="glass-panel rounded-2xl p-6 shadow-sm">
+                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-900 border-b border-indigo-100 pb-2">
+                            <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Create Role
+                        </h2>
+                        <form id="role-form" class="space-y-3">
+                            <div>
+                                <input type="text" id="new-role-name" required class="w-full text-sm rounded-lg border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 bg-white/70 outline-none" placeholder="E.g., Designer">
+                            </div>
+                            <button type="submit" class="w-full text-sm bg-indigo-100 text-indigo-700 font-semibold py-2 rounded-lg hover:bg-indigo-200 transition-colors">
+                                Add Role
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Add Task Form -->
+                    <div class="glass-panel rounded-2xl p-6 shadow-sm sticky top-10">
+                        <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-indigo-900 border-b border-indigo-100 pb-3">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                            New Task
+                        </h2>
+                        <form id="task-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Title <span class="text-red-500">*</span></label>
+                                <input type="text" id="title" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none placeholder-slate-400" placeholder="E.g., Design homepage">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Description</label>
+                                <textarea id="description" rows="3" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none resize-none placeholder-slate-400" placeholder="Task details..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Assign to Role</label>
+                                <select id="assigned_role_id" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+                                    <option value="">Unassigned</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:shadow-lg transition-transform transform hover:-translate-y-0.5 mt-2">
+                                Create Task
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Column: Task Board -->
+                <div id="board-container" class="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6 transition-all relative">
+                    
+                    <!-- Admin Warning Message Placeholder -->
+                    <div id="no-roles-warning" class="absolute -top-12 left-0 right-0 bg-yellow-50 text-yellow-800 p-3 rounded-lg border border-yellow-200 text-sm hidden font-medium">
+                        You have not created any Custom Roles yet. Members cannot register without roles. Please create a role in the sidebar first.
+                    </div>
+
+                    <!-- Pending Column -->
+                    <div class="flex flex-col rounded-2xl bg-slate-100/50 border border-slate-200/50 p-4 shadow-inner">
+                        <div class="flex items-center justify-between mb-4 px-2 py-2 border-b border-amber-200/50 bg-amber-50/50 rounded-lg">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-md shadow-amber-400/50"></span>
+                                Pending
+                            </h3>
+                            <span id="count-pending" class="text-sm font-bold bg-white py-1 px-3 rounded-full text-amber-600 shadow-sm border border-amber-100">0</span>
+                        </div>
+                        <div id="col-pending" class="flex-1 space-y-4 min-h-[200px]"></div>
+                    </div>
+
+                    <!-- In Progress Column -->
+                    <div class="flex flex-col rounded-2xl bg-slate-100/50 border border-slate-200/50 p-4 shadow-inner">
+                        <div class="flex items-center justify-between mb-4 px-2 py-2 border-b border-blue-200/50 bg-blue-50/50 rounded-lg">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-md shadow-blue-500/50"></span>
+                                In Progress
+                            </h3>
+                            <span id="count-in_progress" class="text-sm font-bold bg-white py-1 px-3 rounded-full text-blue-600 shadow-sm border border-blue-100">0</span>
+                        </div>
+                        <div id="col-in_progress" class="flex-1 space-y-4 min-h-[200px]"></div>
+                    </div>
+
+                    <!-- Completed Column -->
+                    <div class="flex flex-col rounded-2xl bg-slate-100/50 border border-slate-200/50 p-4 shadow-inner">
+                        <div class="flex items-center justify-between mb-4 px-2 py-2 border-b border-emerald-200/50 bg-emerald-50/50 rounded-lg">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/50"></span>
+                                Completed
+                            </h3>
+                            <span id="count-completed" class="text-sm font-bold bg-white py-1 px-3 rounded-full text-emerald-600 shadow-sm border border-emerald-100">0</span>
+                        </div>
+                        <div id="col-completed" class="flex-1 space-y-4 min-h-[200px]"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend Script Logic -->
+    <script>
+        const API_TASKS = '/tasks';
+        const API_AUTH_LOGIN = '/api/auth/login';
+        const API_AUTH_REGISTER = '/api/auth/register';
+        const API_ROLES = '/api/roles';
+
+        // State
+        let isLoginMode = true;
+        let adminRoles = [];
+        let authState = {
+            token: localStorage.getItem('token') || null,
+            role: localStorage.getItem('role') || null,
+            username: localStorage.getItem('username') || null,
+            custom_role_id: parseInt(localStorage.getItem('custom_role_id')) || null
+        };
+
+        // DOM Elements
+        const authSection = document.getElementById('auth-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const authForm = document.getElementById('auth-form');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const toggleAuthBtnEl = document.getElementById('toggle-auth-btn');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const authError = document.getElementById('auth-error');
+        const authRoleWrapper = document.getElementById('auth-role-wrapper');
+        const authRoleSelect = document.getElementById('auth-role');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        const adminSidebar = document.getElementById('admin-sidebar');
+        const boardContainer = document.getElementById('board-container');
+        const roleSelect = document.getElementById('assigned_role_id');
+        const noRolesWarning = document.getElementById('no-roles-warning');
+
+        // Headers Helper
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authState.token}`
+            };
+        }
+
+        // Initialize Application
+        async function initApp() {
+            if (authState.token) {
+                authSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                document.getElementById('current-username').textContent = `${authState.username} (${authState.role})`;
+                
+                if(authState.role === 'admin') {
+                    adminSidebar.classList.remove('hidden');
+                    boardContainer.classList.remove('lg:col-span-4');
+                    boardContainer.classList.add('lg:col-span-3');
+                    await fetchRolesForAdmin();
+                } else {
+                    // Members see board full width
+                    adminSidebar.classList.add('hidden');
+                    boardContainer.classList.remove('lg:col-span-3');
+                    boardContainer.classList.add('lg:col-span-4');
+                }
+                fetchTasks();
+            } else {
+                authSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+                fetchRolesForRegistration();
+            }
+        }
+
+        // Toggle Auth Mode
+        toggleAuthBtnEl.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            authError.classList.add('hidden');
+            if (isLoginMode) {
+                authSubmitBtn.textContent = 'Login';
+                authSubtitle.textContent = 'Welcome back! Please login.';
+                toggleAuthBtnEl.textContent = 'Need an account? Register here.';
+                authRoleWrapper.classList.add('hidden');
+                document.getElementById('auth-role').removeAttribute('required');
+            } else {
+                authSubmitBtn.textContent = 'Register';
+                authSubtitle.textContent = 'Create a new Member account.';
+                toggleAuthBtnEl.textContent = 'Already have an account? Login here.';
+                authRoleWrapper.classList.remove('hidden');
+                document.getElementById('auth-role').setAttribute('required', 'true');
+            }
+        });
+
+        // Handle Login/Register
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            authError.classList.add('hidden');
+            const username = document.getElementById('auth-username').value;
+            const password = document.getElementById('auth-password').value;
+            const custom_role_id = document.getElementById('auth-role').value;
+            
+            const endpoint = isLoginMode ? API_AUTH_LOGIN : API_AUTH_REGISTER;
+            const payload = isLoginMode ? { username, password } : { username, password, custom_role_id };
+            
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                
+                if(!res.ok) {
+                    throw new Error(data.error || 'Authentication failed');
+                }
+
+                if (!isLoginMode) {
+                    isLoginMode = true;
+                    authSubmitBtn.textContent = 'Login';
+                    authSubtitle.textContent = 'Registration successful! Please login.';
+                    toggleAuthBtnEl.textContent = 'Need an account? Register here.';
+                    authRoleWrapper.classList.add('hidden');
+                    authForm.reset();
+                } else {
+                    authState.token = data.token;
+                    authState.role = data.role;
+                    authState.username = data.username;
+                    authState.custom_role_id = data.custom_role_id;
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('role', data.role);
+                    localStorage.setItem('username', data.username);
+                    if(data.custom_role_id) localStorage.setItem('custom_role_id', data.custom_role_id);
+                    
+                    authForm.reset();
+                    initApp();
+                }
+            } catch (err) {
+                authError.textContent = err.message;
+                authError.classList.remove('hidden');
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            localStorage.clear();
+            authState = { token: null, role: null, username: null, custom_role_id: null };
+            initApp();
+        });
+
+        // Fetch Roles (Public - used for registration)
+        async function fetchRolesForRegistration() {
+            try {
+                const res = await fetch(API_ROLES); // no auth required if we allow registration
+                if(res.ok) {
+                    const roles = await res.json();
+                    authRoleSelect.innerHTML = '<option value="">-- Choose Role --</option>';
+                    roles.forEach(r => {
+                        const opt = document.createElement('option');
+                        opt.value = r.id;
+                        opt.textContent = r.name;
+                        authRoleSelect.appendChild(opt);
+                    });
+                }
+            } catch (e) { console.error('Error fetching roles', e); }
+        }
+
+        // Fetch Roles (Admin Sidebar)
+        async function fetchRolesForAdmin() {
+            try {
+                const res = await fetch(API_ROLES, { headers: getHeaders() });
+                if(res.ok) {
+                    const roles = await res.json();
+                    adminRoles = roles;
+                    
+                    // Populate Assign Task dropdown
+                    roleSelect.innerHTML = '<option value="">Unassigned</option>';
+                    roles.forEach(r => {
+                        const opt = document.createElement('option');
+                        opt.value = r.id;
+                        opt.textContent = r.name;
+                        roleSelect.appendChild(opt);
+                    });
+
+                    // Warning if no roles
+                    if(roles.length === 0) noRolesWarning.classList.remove('hidden');
+                    else noRolesWarning.classList.add('hidden');
+                }
+            } catch (e) { console.error('Failed fetching roles', e); }
+        }
+
+        // Create Custom Role
+        document.getElementById('role-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Adding...';
+            btn.disabled = true;
+
+            const name = document.getElementById('new-role-name').value;
+            try {
+                const res = await fetch(API_ROLES, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ name })
+                });
+                if(res.ok) {
+                    e.target.reset();
+                    await fetchRolesForAdmin();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to create role');
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+
+        // Fetch Tasks
+        async function fetchTasks() {
+            try {
+                const res = await fetch(API_TASKS, { headers: getHeaders() });
+                if (res.status === 401 || res.status === 403) {
+                    logoutBtn.click();
+                    return;
+                }
+                const tasks = await res.json();
+                renderTasks(tasks);
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
+        }
+
+        // Render Tasks
+        function renderTasks(tasks) {
+            const columns = {
+                pending: document.getElementById('col-pending'),
+                in_progress: document.getElementById('col-in_progress'),
+                completed: document.getElementById('col-completed')
+            };
+
+            const counts = { pending: 0, in_progress: 0, completed: 0 };
+            Object.values(columns).forEach(col => col.innerHTML = '');
+
+            tasks.forEach(task => {
+                const status = task.status || 'pending';
+                if(columns[status]) {
+                    const card = document.createElement('div');
+                    card.className = "task-card-enter bg-white p-5 rounded-xl text-left border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 group hover:-translate-y-1 relative";
+                    
+                    const nextStatusMap = {
+                        'pending': 'in_progress',
+                        'in_progress': 'completed',
+                        'completed': 'pending'
+                    };
+
+                    const actionBtnLabel = status === 'pending' ? 'Start' : (status === 'in_progress' ? 'Complete' : 'Reopen');
+                    let actionBtnColor = status === 'pending' 
+                        ? 'text-blue-700 bg-blue-50 hover:bg-blue-100 border-blue-200' 
+                        : (status === 'in_progress' ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-amber-700 bg-amber-50 hover:bg-amber-100 border-amber-200');
+
+                    // Check if member is allowed to interact
+                    const isUnassigned = task.assigned_role_id === null;
+                    const matchesRole = task.assigned_role_id === authState.custom_role_id;
+                    const canEdit = authState.role === 'admin' || isUnassigned || matchesRole;
+
+                    let actionBtnAttributes = '';
+                    if(!canEdit) {
+                        actionBtnColor = 'text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed opacity-50';
+                        actionBtnAttributes = 'disabled title="You do not have the role to update this task"';
+                    } else {
+                        actionBtnAttributes = `onclick="updateTaskStatus(${task.id}, '${nextStatusMap[status]}')"`;
+                    }
+
+                    // Only Admins can delete
+                    const deleteBtnHtml = authState.role === 'admin' ? `
+                        <div class="dropdown inline-block absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="deleteTask(${task.id})" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded-md hover:bg-red-50" title="Delete Task">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    ` : '';
+
+                    const startLetter = task.assigned_role_name ? task.assigned_role_name.charAt(0).toUpperCase() : '?';
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-bold text-slate-800 leading-tight pr-6">${task.title}</h4>
+                            ${deleteBtnHtml}
+                        </div>
+                        ${task.description ? `<p class="text-sm text-slate-600 mb-5 line-clamp-3 leading-relaxed">${task.description}</p>` : '<div class="mb-5"></div>'}
+                        
+                        <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-100 to-purple-200 flex items-center justify-center text-xs font-bold text-indigo-700 ring-2 ring-white shadow-sm" title="Role: ${task.assigned_role_name || 'Unassigned'}">
+                                    ${startLetter}
+                                </div>
+                                <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">${task.assigned_role_name || 'Unassigned'}</span>
+                            </div>
+                            <button ${actionBtnAttributes} class="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border shadow-sm ${actionBtnColor}">
+                                ${actionBtnLabel}
+                            </button>
+                        </div>
+                    `;
+                    columns[status].appendChild(card);
+                    counts[status]++;
+                }
+            });
+
+            document.getElementById('count-pending').textContent = counts.pending;
+            document.getElementById('count-in_progress').textContent = counts.in_progress;
+            document.getElementById('count-completed').textContent = counts.completed;
+        }
+
+        // Create Task
+        document.getElementById('task-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Creating...';
+            btn.disabled = true;
+
+            const newTask = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                assigned_role_id: document.getElementById('assigned_role_id').value || null,
+                status: 'pending'
+            };
+
+            try {
+                const res = await fetch(API_TASKS, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(newTask)
+                });
+                if(res.ok) {
+                    e.target.reset();
+                    await fetchTasks();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to create task');
+                }
+            } catch (error) {
+                console.error('Error creating task:', error);
+            } finally {
+                btn.innerHTML = 'Create Task';
+                btn.disabled = false;
+            }
+        });
+
+        // Update Task Status
+        window.updateTaskStatus = async function(id, newStatus) {
+            try {
+                const res = await fetch(`${API_TASKS}/${id}`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if(res.ok) {
+                    fetchTasks();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to update task');
+                }
+            } catch (error) {
+                console.error('Error updating task:', error);
+            }
+        }
+
+        // Delete Task
+        window.deleteTask = async function(id) {
+            if(!confirm('Are you sure you want to delete this task?')) return;
+            try {
+                const res = await fetch(`${API_TASKS}/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                if(res.ok) {
+                    fetchTasks();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to delete task');
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+            }
+        }
+
+        // Init on load
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
