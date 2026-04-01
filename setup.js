@@ -18,6 +18,7 @@ async function setupDatabase() {
 
         // Drop existing tables
         console.log('Dropping existing tables...');
+        await connection.query('DROP TABLE IF EXISTS activity_logs;');
         await connection.query('DROP TABLE IF EXISTS tasks;');
         await connection.query('DROP TABLE IF EXISTS users;');
         await connection.query('DROP TABLE IF EXISTS custom_roles;');
@@ -57,12 +58,27 @@ async function setupDatabase() {
                 status ENUM('pending', 'in_progress', 'pending_review', 'completed') DEFAULT 'pending',
                 due_date DATETIME,
                 evidence_note TEXT,
+                sos_flag BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (assigned_role_id) REFERENCES custom_roles(id) ON DELETE SET NULL
             );
         `;
         await connection.query(createTasksTable);
+
+        console.log('Creating table: activity_logs');
+        const createLogsTable = `
+            CREATE TABLE IF NOT EXISTS activity_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                task_id INT NOT NULL,
+                user_id INT NOT NULL,
+                action VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+        `;
+        await connection.query(createLogsTable);
 
         // Seed default admin account
         console.log('Checking for default admin...');
