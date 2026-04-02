@@ -296,7 +296,7 @@ app.put('/tasks/:id/review', verifyToken, async (req, res) => {
     const { action } = req.body;
 
     try {
-        const [tasks] = await pool.query('SELECT assigned_role_id FROM tasks WHERE id = ?', [id]);
+        const [tasks] = await pool.query('SELECT title, assigned_role_id FROM tasks WHERE id = ?', [id]);
         if (tasks.length === 0) return res.status(404).json({ error: 'Task not found' });
         const task = tasks[0];
 
@@ -310,6 +310,14 @@ app.put('/tasks/:id/review', verifyToken, async (req, res) => {
         if (action === 'approve') {
             await pool.query('UPDATE tasks SET status = \'completed\' WHERE id = ?', [id]);
             await logActivity(req, id, 'Đã DUYỆT (Approve) công việc');
+            
+            // Discord Notification - Task Approved
+            sendDiscordNotification(
+                `✅ Task Approved & Completed: ${task.title}`,
+                `Task was successfully reviewed and approved by **${req.user.username}**.`,
+                3066993 // Green color
+            );
+
             res.json({ message: 'Task approved' });
         } else if (action === 'reject') {
             await pool.query('UPDATE tasks SET status = \'in_progress\', evidence_note = NULL WHERE id = ?', [id]);
