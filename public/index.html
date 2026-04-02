@@ -142,7 +142,7 @@
                 </div>
 
                 <!-- BOARD VIEW -->
-                <div id="board-container" class="grid grid-cols-1 md:grid-cols-4 gap-6 transition-all relative">
+                <div id="board-container" class="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 gap-6 transition-all relative pb-6 -mx-4 px-4 md:mx-0 md:px-0 custom-scrollbar">
                     
                     <!-- Admin Warning Message Placeholder -->
                     <div id="no-roles-warning" class="absolute -top-12 left-0 right-0 bg-yellow-50 text-yellow-800 p-3 rounded-lg border border-yellow-200 text-sm hidden font-medium">
@@ -150,7 +150,7 @@
                     </div>
 
                     <!-- Pending Column -->
-                    <div class="flex flex-col rounded-2xl bg-slate-100/50 border border-slate-200/50 p-4 shadow-inner">
+                    <div class="flex flex-col rounded-2xl bg-slate-100/50 border border-slate-200/50 p-4 shadow-inner min-w-[85%] md:min-w-0 snap-center shrink-0">
                         <div class="flex items-center justify-between mb-4 px-2 py-2 border-b border-amber-200/50 bg-amber-50/50 rounded-lg">
                             <h3 class="font-bold text-slate-800 flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-md shadow-amber-400/50"></span>
@@ -202,8 +202,8 @@
         </div>
 
         <!-- Task Detail Modal (Phase 7 - Hidden) -->
-        <div id="task-detail-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 duration-300">
-            <div class="glass-panel w-full max-w-5xl h-[85vh] mx-4 rounded-2xl shadow-2xl relative transform transition-transform scale-95 opacity-0 duration-300 flex flex-col md:flex-row overflow-hidden" id="task-detail-modal-content">
+        <div id="task-detail-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-6 bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0 duration-300">
+            <div class="glass-panel w-full max-w-5xl md:h-[85vh] max-h-[90vh] md:max-h-none rounded-2xl shadow-2xl relative transform transition-transform scale-95 opacity-0 duration-300 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden" id="task-detail-modal-content">
                 <!-- Close Btn -->
                 <button type="button" onclick="closeDetailModal()" class="absolute top-4 right-4 z-10 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition-colors focus:outline-none shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -228,7 +228,7 @@
                 </div>
 
                 <!-- Left Column (70%) -->
-                <div class="flex-[7] p-8 overflow-y-auto bg-white/50 custom-scrollbar pb-16 relative">
+                <div class="flex-[7] p-6 md:p-8 md:overflow-y-auto bg-white/50 custom-scrollbar shrink-0 md:shrink relative">
                     <div class="flex items-center gap-3 mb-2 flex-wrap">
                         <span id="detail-date" class="text-xs font-semibold text-slate-500 bg-white px-2.5 py-1.5 rounded-lg shadow-sm border border-slate-200 mt-1 flex items-center gap-1.5"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span id="detail-date-text"></span></span>
                         <span id="detail-assignee" class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2.5 py-1.5 rounded-lg shadow-sm border border-indigo-200 mt-1"></span>
@@ -253,7 +253,7 @@
                 </div>
 
                 <!-- Right Column (30%) -->
-                <div class="flex-[3] p-6 lg:p-8 bg-slate-50/80 border-t md:border-t-0 md:border-l border-slate-200 flex flex-col max-h-[85vh]">
+                <div class="flex-[3] p-6 lg:p-8 bg-slate-50/80 border-t md:border-t-0 md:border-l border-slate-200 flex flex-col md:max-h-[85vh] md:overflow-y-auto shrink-0 md:shrink custom-scrollbar">
                     <div class="shrink-0 space-y-5">
                         <h3 class="font-bold text-slate-400 text-xs tracking-widest uppercase mb-4">Properties</h3>
                         
@@ -1065,5 +1065,10 @@
         // Init on load
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
+
+    <!-- Floating Action Button (Mobile Only) -->
+    <button id="mobile-fab" onclick="openTaskModal()" class="md:hidden fixed bottom-6 right-6 z-[90] bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all focus:outline-none flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+    </button>
 </body>
 </html>
