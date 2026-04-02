@@ -338,5 +338,4 @@ app.delete('/tasks/:id', verifyToken, isAdmin, async (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
-    sendDiscordNotification('🟢 System Online', 'Task Manager Backend Server has been successfully restarted and is ready.', 3447003);
 });
