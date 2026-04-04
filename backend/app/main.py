@@ -40,6 +40,6 @@ app.include_router(tasks.router)
 
 # Serve static frontend
 # Express does: app.use(express.static('public'));
-public_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "public")
+public_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
 if os.path.isdir(public_dir):
-    app.mount("/", StaticFiles(directory=public_dir, html=True), name="public")
+    app.mount("/", StaticFiles(directory=public_dir, html=True), name="frontend")
