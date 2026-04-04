@@ -1,6 +1,6 @@
 # 🚀 Taskboard: Modern Kanban Management System
 
-A full-stack, lightweight, and highly responsive Kanban task management application built with **Node.js, Express, MySQL, and Tailwind CSS**. This application is designed to streamline team workflows with deep features like Role-Based Access Control (RBAC), multi-stage review logic, Discord webhook integration, and Markdown-supported task details.
+A full-stack, lightweight, and highly responsive Kanban task management application built with **Python, FastAPI, SQLAlchemy (Async), MySQL, and Tailwind CSS**. This application is designed to streamline team workflows with deep features like Role-Based Access Control (RBAC), multi-stage review logic, Discord webhook integration, and Markdown-supported task details.
 
 ---
 
@@ -25,56 +25,57 @@ A full-stack, lightweight, and highly responsive Kanban task management applicat
 ## 🛠 Tech Stack
 
 - **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS (via CDN)
-- **Backend**: Node.js, Express.js
-- **Database**: MySQL (Compatible with Aiven Cloud and regular MySQL servers)
-- **Authentication**: JWT (JSON Web Tokens) & `bcryptjs`
-- **Integrations**: Discord API (Webhook Embeds) via `node-fetch`
+- **Backend**: Python 3, FastAPI, Uvicorn
+- **Database**: MySQL (Async via `aiomysql`) + SQLAlchemy 2.0 ORM
+- **Authentication**: JWT (JSON Web Tokens) & `bcrypt`
+- **Integrations**: Discord API (Webhook Embeds) via `httpx`
 
 ---
 
 ## ⚙️ Installation & Setup
 
 ### 1. Prerequisites
-- Node.js (v18+ recommended)
+- Python 3.10+
 - MySQL Server (Local or Cloud)
 
 ### 2. Clone repository & Install dependencies
-\`\`\`bash
+```bash
 git clone <your-repository-url>
-cd <repository-directory>
-npm install express mysql2 bcryptjs jsonwebtoken dotenv node-fetch
-\`\`\`
+cd <repository-directory>/backend
+python -m venv .venv
+source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
 ### 3. Configure Environment Variables
-Create a `.env` file in the root directory and populate it with your configuration:
-\`\`\`env
+Create a `.env` file in the **root directory** (outside `/backend`) and populate it with your configuration:
+```env
 # Database Credentials
 DB_HOST=your_mysql_host
 DB_USER=your_mysql_user
 DB_PASSWORD=your_mysql_password
 DB_NAME=your_mysql_database
-DB_PORT=25060
+DB_PORT=3306
 
 # Authentication
 JWT_SECRET=your_super_secret_jwt_key
 
 # Discord Webhook Integration (Optional)
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your_webhook_id/your_webhook_token
-\`\`\`
+```
 
 ### 4. Initialize Database
-Run the setup script to create the necessary tables and seed the default Admin account.
-\`\`\`bash
-node setup.js
-\`\`\`
-> **Note**: The default admin login created is Username: \`admin\` / Password: \`123456\`.
+Run the setup script inside the `backend/` directory to create the necessary tables and seed the default Admin account.
+```bash
+cd backend
+python setup_db.py
+```
+> **Note**: The default admin login created is Username: `admin` / Password: `123456`.
 
 ### 5. Start the Application
-\`\`\`bash
-node app.js
-\`\`\`
-The application will be accessible at \`http://localhost:3000\`. If Discord Webhook is configured correctly, a "🟢 System Online" notification will instantly appear in your Discord channel.
-
+```bash
+uvicorn app.main:app --host 127.0.0.1 --port 3000
+```
 ---
 
 ## 📖 Usage Guide
@@ -89,4 +90,4 @@ The application will be accessible at \`http://localhost:3000\`. If Discord Webh
 ---
 
 ## 📄 License
-This project is open-source and available under the [MIT License](LICENSE). 
+This project is open-source and available under the [MIT License](LICENSE).
