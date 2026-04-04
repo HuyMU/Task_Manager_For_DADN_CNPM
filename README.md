@@ -93,22 +93,21 @@ uvicorn app.main:app --host 127.0.0.1 --port 3000
 This project is open-source and available under the [MIT License](LICENSE).
 
 ## 📁 Project Structure
-\\	ext
-.../
-├── backend/               # Python FastAPI backend
-│   ├── app/               # Application source code
-│   │   ├── core/          # Exception handlers, security configurations
-│   │   ├── dependencies/  # FastAPI dependencies (DB, auth)
-│   │   ├── models/        # SQLAlchemy database models
-│   │   ├── repositories/  # Database access layer (CRUD)
-│   │   ├── routers/       # API route definitions
-│   │   ├── schemas/       # Pydantic schemas for data validation
-│   │   └── services/      # Business logic and use cases
-│   ├── .venv/             # Python virtual environment
-│   ├── requirements.txt   # Python dependencies
-│   └── setup_db.py        # Database initialization script
-├── frontend/              # Frontend UI layer
-│   └── index.html         # Main dashboard HTML & logic
-├── .env                   # Environment variables configuration
-└── README.md              # Project documentation
-\
+```text
+.
+├── backend/                # Python FastAPI backend
+│   ├── app/                # Application source code
+│   │   ├── core/           # Exception handlers, security configurations
+│   │   ├── dependencies/   # FastAPI dependencies (DB, auth)
+│   │   ├── models/         # SQLAlchemy database models
+│   │   ├── repositories/   # Database access layer (CRUD)
+│   │   ├── routers/        # API route definitions
+│   │   ├── schemas/        # Pydantic schemas for data validation
+│   │   └── services/       # Business logic and use cases
+│   ├── .venv/              # Python virtual environment
+│   ├── requirements.txt    # Python dependencies
+│   └── setup_db.py         # Database initialization script
+├── frontend/               # Frontend UI layer
+│   └── index.html          # Main dashboard HTML & logic
+├── .env                    # Environment variables configuration
+└── README.md               # Project documentation
