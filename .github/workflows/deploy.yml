@@ -1,0 +1,53 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_check:
+    name: Build & Code Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Syntax Check
+        run: |
+          cd backend
+          python -m compileall .
+
+  deploy:
+    name: Deploy to Render
+    needs: build_and_check
+    runs-on: ubuntu-latest
+    # Chỉ trigger deploy khi nhánh được push là nhánh main
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Trigger Render Deploy Hook
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$deploy_url" ]; then
+            echo "Error: RENDER_DEPLOY_HOOK secret is not set!"
+            exit 1
+          fi
+          echo "Triggering Render deployment..."
+          curl -s --fail -X POST "$deploy_url"
+          echo "Deployment triggered successfully!"

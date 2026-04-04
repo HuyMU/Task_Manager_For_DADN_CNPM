@@ -35,7 +35,7 @@ A full-stack, lightweight, and highly responsive Kanban task management applicat
 ## ⚙️ Installation & Setup
 
 ### 1. Prerequisites
-- Python 3.10+
+- Python 3.11.0
 - MySQL Server (Local or Cloud)
 
 ### 2. Clone repository & Install dependencies
@@ -86,6 +86,22 @@ uvicorn app.main:app --host 127.0.0.1 --port 3000
    - Members click "Start" to move a task to `In Progress`.
    - Once done, they click "Complete Task", fill out the Evidence note, and it goes to `Pending Review`.
    - The Admin (or an authorized Reviewer) reviews the task within the Detail Modal and decides to Approve or Reject it.
+
+## 🚀 CI/CD Pipeline & Deployment
+
+This repository includes a fully configured **GitHub Actions** CI/CD pipeline (`.github/workflows/deploy.yml`). 
+
+### How it works:
+1. Every time you push or merge a Pull Request to the `main` branch, GitHub Actions will:
+   - Setup Python 3.11 and verify all backend dependencies (`requirements.txt`).
+   - Run a syntax check (`compileall`) to ensure the codebase is healthy.
+2. If the build passes, it automatically triggers your **Render Deploy Hook** using the GitHub Secrets.
+
+### Setup Deployment
+1. Go to your **GitHub Repository Settings** > **Secrets and variables** > **Actions**.
+2. Create a new repository secret named: `RENDER_DEPLOY_HOOK`.
+3. Paste the unique Webhook URL provided by your Render dashboard into the secret's value. 
+4. Render Configuration: Make sure your Render Web Service sets the **Root Directory** to `backend`, the build command to `pip install -r requirements.txt`, and the start command to `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
 
 ---
 
