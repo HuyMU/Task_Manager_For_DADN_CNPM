@@ -93,6 +93,7 @@ uvicorn app.main:app --host 127.0.0.1 --port 3000
 This project is open-source and available under the [MIT License](LICENSE).
 
 ## 📁 Project Structure
+\\	ext
 ├── backend/               # Python FastAPI backend
 │   ├── app/               # Application source code
 │   │   ├── core/          # Exception handlers, security configurations
