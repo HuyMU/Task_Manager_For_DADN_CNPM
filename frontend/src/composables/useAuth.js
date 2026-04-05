@@ -10,7 +10,7 @@ const username = ref(localStorage.getItem('username') || null)
 
 // Create an Axios instance with base URL
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:3000'
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://127.0.0.1:3000')
 })
 
 // Request interceptor to add token
