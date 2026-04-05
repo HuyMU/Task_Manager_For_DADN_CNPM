@@ -34,6 +34,7 @@ class TaskService:
             
         task = await self.task_repo.create_task(data)
         await self._log_activity(task.id, current_user.id, "Đã tạo công việc này")
+        await self.task_repo.session.commit()
         
         await send_discord_notification(
             title=f"🚀 New Task Created: {task.title}",
@@ -81,6 +82,7 @@ class TaskService:
                     color=15158332
                 )
                 
+        await self.task_repo.session.commit()
         return task
 
     async def request_review(self, task_id: int, evidence_note: str | None, current_user: TokenPayload) -> Task:
@@ -96,6 +98,7 @@ class TaskService:
         
         note_text = "Có đính kèm evidence" if evidence_note else "Không có evidence"
         await self._log_activity(task.id, current_user.id, f"Đã gửi yêu cầu duyệt ({note_text})")
+        await self.task_repo.session.commit()
         return task
 
     async def review_task(self, task_id: int, action: str, current_user: TokenPayload) -> Task:
@@ -124,8 +127,10 @@ class TaskService:
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid action. Use "approve" or "reject".')
             
+        await self.task_repo.session.commit()
         return task
 
     async def delete_task(self, task_id: int) -> None:
         task = await self.get_task(task_id)
         await self.task_repo.delete_task(task)
+        await self.task_repo.session.commit()

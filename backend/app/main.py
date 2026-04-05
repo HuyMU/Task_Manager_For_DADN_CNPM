@@ -39,7 +39,16 @@ app.include_router(users.router)
 app.include_router(tasks.router)
 
 # Serve static frontend
-# Express does: app.use(express.static('public'));
-public_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
+from fastapi.responses import FileResponse
+
+public_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend", "dist")
 if os.path.isdir(public_dir):
-    app.mount("/", StaticFiles(directory=public_dir, html=True), name="frontend")
+    app.mount("/assets", StaticFiles(directory=os.path.join(public_dir, "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        path = os.path.join(public_dir, full_path)
+        if os.path.isfile(path):
+            return FileResponse(path)
+        return FileResponse(os.path.join(public_dir, "index.html"))
+

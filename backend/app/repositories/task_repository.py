@@ -26,23 +26,21 @@ class TaskRepository:
     async def create_task(self, task_data: dict) -> Task:
         new_task = Task(**task_data)
         self.session.add(new_task)
-        await self.session.commit()
-        await self.session.refresh(new_task)
+        await self.session.flush()
         return new_task
 
     async def update_task(self, task: Task, update_data: dict) -> Task:
         for key, value in update_data.items():
             setattr(task, key, value)
-        await self.session.commit()
-        await self.session.refresh(task)
+        await self.session.flush()
         return task
 
     async def delete_task(self, task: Task):
         await self.session.delete(task)
-        await self.session.commit()
+        await self.session.flush()
 
     async def add_activity_log(self, task_id: int, user_id: int, action: str) -> ActivityLog:
         log = ActivityLog(task_id=task_id, user_id=user_id, action=action)
         self.session.add(log)
-        await self.session.commit()
+        await self.session.flush()
         return log
