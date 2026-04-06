@@ -40,24 +40,24 @@ const handleSubmit = async () => {
   <div class="flex items-center justify-center min-h-[80vh]">
     <div class="glass p-8 rounded-2xl shadow-xl w-full max-w-md">
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">Taskboard</h1>
-        <p class="text-slate-500 mt-2 font-medium">Create a new Member account.</p>
+        <h1 class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">Taskboard</h1>
+        <p class="text-text-muted mt-2 font-medium">Create a new Member account.</p>
       </div>
       
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Username</label>
-          <input v-model="username" type="text" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+          <label class="block text-sm font-semibold text-text-secondary mb-1">Username</label>
+          <input v-model="username" type="text" required class="w-full rounded-xl border border-border-muted shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 px-4 py-2.5 bg-surface-bg text-text-primary outline-none">
         </div>
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
-          <input v-model="password" type="password" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+          <label class="block text-sm font-semibold text-text-secondary mb-1">Password</label>
+          <input v-model="password" type="password" required class="w-full rounded-xl border border-border-muted shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 px-4 py-2.5 bg-surface-bg text-text-primary outline-none">
         </div>
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Select Your Role</label>
-          <select v-model="roleId" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
-            <option value="" disabled>-- Choose Role --</option>
-            <option v-for="r in roles" :key="r.id" :value="r.id">{{ r.name }}</option>
+          <label class="block text-sm font-semibold text-text-secondary mb-1">Select Your Role</label>
+          <select v-model="roleId" required class="w-full rounded-xl border border-border-muted shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 px-4 py-2.5 bg-surface-bg text-text-primary outline-none">
+            <option value="" disabled class="bg-surface-bg text-text-primary">-- Choose Role --</option>
+            <option v-for="r in roles" :key="r.id" :value="r.id" class="bg-surface-bg text-text-primary">{{ r.name }}</option>
           </select>
         </div>
         
@@ -68,7 +68,7 @@ const handleSubmit = async () => {
         </button>
         
         <div class="text-center mt-4">
-          <router-link to="/login" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors">
+          <router-link to="/login" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium transition-colors">
             Already have an account? Login here.
           </router-link>
         </div>

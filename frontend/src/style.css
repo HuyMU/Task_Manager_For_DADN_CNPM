@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@theme {
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-surface-bg: var(--surface-bg);
+  --color-surface-hover: var(--surface-hover);
+  --color-border-color: var(--border-color);
+  --color-border-muted: var(--border-muted);
+  --color-app-bg-from: var(--app-bg-from);
+  --color-app-bg-via: var(--app-bg-via);
+  --color-app-bg-to: var(--app-bg-to);
+}
+
+/* stylelint-disable-next-line at-rule-no-unknown */
+@custom-variant dark (&:is(.dark, .dark *));
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
   /* Classes moved directly to index.html to avoid @apply conflicts */
@@ -7,9 +23,9 @@ body {
 
 @layer utilities {
   .glass {
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: var(--surface-bg);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm equivalent */
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   }
 }

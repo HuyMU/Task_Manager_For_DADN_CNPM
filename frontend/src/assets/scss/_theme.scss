@@ -1,0 +1,54 @@
+:root {
+  /* Semantic Text Colors */
+  --text-primary: #0f172a; /* slate-900 */
+  --text-secondary: #475569; /* slate-600 */
+  --text-muted: #94a3b8; /* slate-400 */
+  
+  /* Semantic Backgrounds */
+  --app-bg-from: #eef2ff; /* indigo-50 */
+  --app-bg-via: #ffffff;
+  --app-bg-to: #faf5ff; /* fuchsia-50 */
+  
+  --surface-bg: rgba(255, 255, 255, 0.7);
+  --surface-hover: rgba(255, 255, 255, 0.9);
+  
+  /* Borders */
+  --border-color: rgba(255, 255, 255, 0.6);
+  --border-muted: rgba(203, 213, 225, 0.5); /* slate-300 with opacity */
+
+  /* Column Backdrops */
+  --column-bg: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
+  --column-border: rgba(255,255,255,0.6);
+
+  /* Glassmorphism Settings (Light Mode) */
+  --glass-blur: 16px;
+  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  /* Semantic Text Colors - Extremely High Contrast */
+  --text-primary: #ffffff; /* pure white */
+  --text-secondary: #cbd5e1; /* slate-300 */
+  --text-muted: #94a3b8; /* slate-400 */
+  
+  /* Semantic Backgrounds - Solid & Deep */
+  --app-bg-from: #020617; /* slate-950 */
+  --app-bg-via: #020617; /* slate-950 */
+  --app-bg-to: #020617; /* slate-950 */
+  
+  --surface-bg: #0f172a; /* slate-900 (solid) */
+  --surface-hover: #1e293b; /* slate-800 */
+  
+  /* Borders */
+  --border-color: #334155; /* slate-700 */
+  --border-muted: #1e293b; /* slate-800 */
+
+  /* Column Backdrops */
+  --column-bg: #020617;
+  --column-border: #0f172a;
+
+  /* Glassmorphism Settings (Disabled effectively for dark mode) */
+  --glass-blur: 0px; 
+  --glass-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
+}
+

@@ -112,34 +112,34 @@ const submitCreateTask = async () => {
     <!-- Create Task Modal -->
     <div v-if="isCreateModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
       <div class="glass w-full max-w-lg mx-4 rounded-2xl shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
-        <button type="button" @click="isCreateModalOpen = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors focus:outline-none">
+        <button type="button" @click="isCreateModalOpen = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-1.5 transition-colors focus:outline-none">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         
-        <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-indigo-900 border-b border-indigo-100 pb-3 shrink-0">
-          <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-indigo-900 dark:text-indigo-300 border-b border-indigo-100 dark:border-slate-700 pb-3 shrink-0">
+          <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
           New Task
         </h2>
         
         <div class="overflow-y-auto pr-2 pb-2 custom-scrollbar">
           <form @submit.prevent="submitCreateTask" class="space-y-4">
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Title <span class="text-red-500">*</span></label>
-              <input v-model="newTask.title" type="text" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none placeholder-slate-400" placeholder="E.g., Design homepage">
+              <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Title <span class="text-red-500">*</span></label>
+              <input v-model="newTask.title" type="text" required class="w-full rounded-xl border-slate-200 dark:border-slate-600 shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 dark:bg-slate-800/80 dark:text-white outline-none placeholder-slate-400 dark:placeholder-slate-500" placeholder="E.g., Design homepage">
             </div>
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Description</label>
-              <textarea v-model="newTask.description" rows="3" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none resize-none placeholder-slate-400" placeholder="Task details..."></textarea>
+              <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Description</label>
+              <textarea v-model="newTask.description" rows="3" class="w-full rounded-xl border-slate-200 dark:border-slate-600 shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 dark:bg-slate-800/80 dark:text-white outline-none resize-none placeholder-slate-400 dark:placeholder-slate-500" placeholder="Task details..."></textarea>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Deadline <span class="text-red-500">*</span></label>
-              <input v-model="newTask.due_date" type="datetime-local" required class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
+              <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Deadline <span class="text-red-500">*</span></label>
+              <input v-model="newTask.due_date" type="datetime-local" required class="w-full rounded-xl border-slate-200 dark:border-slate-600 shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 dark:bg-slate-800/80 dark:text-white outline-none" style="color-scheme: light dark;">
             </div>
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Assign to Role</label>
-              <select v-model="newTask.assigned_role_id" class="w-full rounded-xl border-slate-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 outline-none">
-                <option value="">Unassigned</option>
-                <option v-for="r in roles" :key="r.id" :value="r.id">{{ r.name }}</option>
+              <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Assign to Role</label>
+              <select v-model="newTask.assigned_role_id" class="w-full rounded-xl border-slate-200 dark:border-slate-600 shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 px-4 py-2.5 bg-white/70 dark:bg-slate-800/80 dark:text-white outline-none">
+                <option value="" class="dark:bg-slate-800">Unassigned</option>
+                <option v-for="r in roles" :key="r.id" :value="r.id" class="dark:bg-slate-800">{{ r.name }}</option>
               </select>
             </div>
             <button type="submit" :disabled="isCreating" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 rounded-xl hover:shadow-lg transition-transform transform hover:-translate-y-0.5 mt-2 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">

@@ -101,22 +101,22 @@ const actionButton = computed(() => {
 
     <!-- Move delete button to outer container for proper hovering -->
     <div v-if="canDelete" class="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 z-30">
-      <button @click.stop="$emit('delete', task.id)" :class="$style.deleteBtn" class="p-1.5 rounded-md bg-white shadow-sm ring-1 ring-slate-900/5 hover:bg-red-50 hover:text-red-600 transition duration-200" title="Delete Task">
+      <button @click.stop="$emit('delete', task.id)" :class="$style.deleteBtn" class="p-1.5 rounded-md shadow-sm ring-1 ring-border-muted hover:bg-red-50 hover:text-red-600 transition duration-200" title="Delete Task">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
       </button>
     </div>
 
     <div class="flex justify-between items-start mb-3 mt-1 relative z-10">
-      <h4 class="font-bold text-slate-800 leading-tight pr-8">{{ task.title }}</h4>
+      <h4 class="font-bold text-text-primary leading-tight pr-8">{{ task.title }}</h4>
     </div>
     
-    <p v-if="task.description" class="text-sm text-slate-600 mb-3 line-clamp-3 leading-relaxed relative z-10" style="word-break: break-all;">
+    <p v-if="task.description" class="text-sm text-text-secondary mb-3 line-clamp-3 leading-relaxed relative z-10" style="word-break: break-all;">
       {{ task.description }}
     </p>
     <div v-else class="mb-3 relative z-10"></div>
 
     <div v-if="task.evidence_note" class="mt-2 text-xs p-2 rounded-md break-words mb-2 relative z-10" :class="$style.evidenceBox">
-      <b>Evidence:</b> {{ task.evidence_note }}
+      <b>Evidence:</b> <span>{{ task.evidence_note }}</span>
     </div>
 
     <div class="flex flex-wrap items-center justify-between gap-y-3 mt-auto pt-4 relative z-10" :class="$style.cardFooter">
@@ -166,6 +166,10 @@ const actionButton = computed(() => {
   &:hover {
     box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15), 0 18px 36px -18px rgba(0, 0, 0, 0.1);
   }
+  
+  :global(.dark) &:hover {
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5), 0 18px 36px -18px rgba(0, 0, 0, 0.4);
+  }
 }
 
 .glow {
@@ -176,41 +180,55 @@ const actionButton = computed(() => {
   mix-blend-mode: overlay;
   transition: opacity 0.3s ease;
   z-index: 1;
+  :global(.dark) & { mix-blend-mode: normal; opacity: 0.15 !important; }
 }
 
-.sosBadge {
-  background-color: #dc2626;
-}
+.sosBadge { background-color: #dc2626; }
 
 .deleteBtn {
-  color: #94a3b8;
+  color: var(--text-muted);
+  background-color: transparent;
   transition: all 0.2s;
-  &:hover {
-    color: #ef4444;
-    background-color: #fef2f2;
-  }
+  &:hover { color: #ef4444; background-color: #fef2f2; }
+  :global(.dark) &:hover { background-color: rgba(239, 68, 68, 0.15); }
 }
 
 .evidenceBox {
   background-color: #eef2ff;
   border: 1px solid #e0e7ff;
   color: #3730a3;
+  :global(.dark) & {
+    background-color: rgba(67, 56, 202, 0.15);
+    border-color: rgba(99, 102, 241, 0.2);
+    color: #e0e7ff;
+  }
 }
 
 .cardFooter {
   border-top-color: rgba(241, 245, 249, 0.5);
+  :global(.dark) & { border-top-color: rgba(51, 65, 85, 0.5); }
 }
 
 .avatar {
   background: linear-gradient(135deg, #e0e7ff, #e9d5ff);
   color: #4338ca;
   border-color: white;
+  :global(.dark) & {
+    background: linear-gradient(135deg, #3730a3, #6b21a8);
+    color: #e0e7ff;
+    border-color: rgba(255,255,255,0.1);
+  }
 }
 
 .roleLabel {
   background-color: #f8fafc;
   color: #64748b;
   border-color: #e2e8f0;
+  :global(.dark) & {
+    background-color: rgba(30, 41, 59, 0.6);
+    color: #94a3b8;
+    border-color: rgba(71, 85, 105, 0.5);
+  }
 }
 
 .actionBtn {
@@ -223,43 +241,43 @@ const actionButton = computed(() => {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  
-  &:active {
-    transform: scale(0.95);
-  }
+  &:active { transform: scale(0.95); }
 }
 
 .actionBtnBlue {
   color: #1d4ed8; background-color: #eff6ff; border-color: #bfdbfe;
   &:hover { background-color: #dbeafe; }
+  :global(.dark) & { color: #93c5fd; background-color: rgba(29, 78, 216, 0.2); border-color: rgba(59, 130, 246, 0.3); }
+  :global(.dark) &:hover { background-color: rgba(29, 78, 216, 0.3); }
 }
 .actionBtnGreen {
   color: #047857; background-color: #ecfdf5; border-color: #a7f3d0;
   &:hover { background-color: #d1fae5; }
+  :global(.dark) & { color: #6ee7b7; background-color: rgba(4, 120, 87, 0.2); border-color: rgba(16, 185, 129, 0.3); }
+  :global(.dark) &:hover { background-color: rgba(4, 120, 87, 0.3); }
 }
 .actionBtnYellow {
   color: #b45309; background-color: #fffbeb; border-color: #fde68a;
   &:hover { background-color: #fef3c7; }
+  :global(.dark) & { color: #fcd34d; background-color: rgba(180, 83, 9, 0.2); border-color: rgba(245, 158, 11, 0.3); }
+  :global(.dark) &:hover { background-color: rgba(180, 83, 9, 0.3); }
 }
 .actionBtnRed {
   color: #b91c1c; background-color: #fef2f2; border-color: #fecaca;
   &:hover { background-color: #fee2e2; }
+  :global(.dark) & { color: #fca5a5; background-color: rgba(185, 28, 28, 0.2); border-color: rgba(239, 68, 68, 0.3); }
+  :global(.dark) &:hover { background-color: rgba(185, 28, 28, 0.3); }
 }
 .actionBtnDisabled {
   color: #94a3b8; background-color: #f8fafc; border-color: #e2e8f0;
-  cursor: not-allowed;
-  opacity: 0.5;
+  cursor: not-allowed; opacity: 0.5;
   &:active { transform: none; }
+  :global(.dark) & { color: #cbd5e1; background-color: rgba(30, 41, 59, 0.5); border-color: rgba(71, 85, 105, 0.5); }
 }
 
 .waitingLabel {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #7e22ce;
-  background-color: #faf5ff;
-  padding: 0.375rem 0.5rem;
-  border-radius: 0.375rem;
-  border: 1px solid #e9d5ff;
-  user-select: none;
+  font-size: 0.75rem; font-weight: 600; color: #7e22ce; background-color: #faf5ff;
+  padding: 0.375rem 0.5rem; border-radius: 0.375rem; border: 1px solid #e9d5ff; user-select: none;
+  :global(.dark) & { color: #d8b4fe; background-color: rgba(126, 34, 206, 0.2); border-color: rgba(168, 85, 247, 0.3); }
 }
 </style>
