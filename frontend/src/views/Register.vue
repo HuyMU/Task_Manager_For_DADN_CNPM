@@ -1,20 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import type { CustomRole } from '../types'
 
-const username = ref('')
-const password = ref('')
-const roleId = ref('')
-const errorMsg = ref('')
-const loading = ref(false)
-const roles = ref([])
+const username = ref<string>('')
+const password = ref<string>('')
+const roleId = ref<string | number>('')
+const errorMsg = ref<string>('')
+const loading = ref<boolean>(false)
+const roles = ref<CustomRole[]>([])
 const router = useRouter()
 const { register, api } = useAuth()
 
 onMounted(async () => {
   try {
-    const { data } = await api.get('/api/roles')
+    const { data } = await api.get<CustomRole[]>('/api/roles')
     roles.value = data
   } catch(e) {
     console.error('Failed to load roles')
@@ -28,7 +29,7 @@ const handleSubmit = async () => {
     await register({ username: username.value, password: password.value, custom_role_id: roleId.value })
     alert('Registration successful! Please login.')
     router.push('/login')
-  } catch (err) {
+  } catch (err: any) {
     errorMsg.value = err
   } finally {
     loading.value = false

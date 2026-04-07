@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useDark, useToggle } from '@vueuse/core'
 import { Moon, Sun } from 'lucide-vue-next'
 

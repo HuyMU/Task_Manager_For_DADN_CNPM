@@ -1,25 +1,35 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, useCssModule } from 'vue'
 import { marked } from 'marked'
 import { useAuth } from '../composables/useAuth'
 import { useTasks } from '../composables/useTasks'
 import { onClickOutside } from '@vueuse/core'
+import type { Task } from '../types'
 
-const props = defineProps({
-  isOpen: { type: Boolean, required: true },
-  taskId: { type: Number, default: null }
+const $style = useCssModule()
+
+interface Props {
+  isOpen: boolean
+  taskId: number | null
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  taskId: null
 })
 
-const emit = defineEmits(['update:isOpen', 'refresh'])
+const emit = defineEmits<{
+  (e: 'update:isOpen', value: boolean): void
+  (e: 'refresh'): void
+}>()
 
 const { getTaskDetail, toggleSos } = useTasks()
 const { role } = useAuth()
 
-const task = ref(null)
+const task = ref<Task | null>(null)
 const isLoading = ref(false)
-const error = ref(null)
+const error = ref<any>(null)
 
-const modalContent = ref(null)
+const modalContent = ref<HTMLElement | null>(null)
 onClickOutside(modalContent, () => close())
 
 const fetchTaskData = async () => {
@@ -49,7 +59,7 @@ const close = () => {
   emit('update:isOpen', false)
 }
 
-const handleEsc = (e) => {
+const handleEsc = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && props.isOpen) close()
 }
 
@@ -62,7 +72,7 @@ onUnmounted(() => {
   document.body.style.overflow = ''
 })
 
-const formatDateTime = (isoString) => {
+const formatDateTime = (isoString: string | undefined) => {
   if (!isoString) return ''
   return new Date(isoString).toLocaleString('vi-VN', {
     day: '2-digit', month: '2-digit', year: 'numeric',
@@ -70,7 +80,7 @@ const formatDateTime = (isoString) => {
   })
 }
 
-const getLogIcon = (actionType) => {
+const getLogIcon = (actionType: string) => {
   if (actionType === 'created') return '<div class="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>'
   else if (actionType === 'status_changed') return '<div class="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>'
   else if (actionType === 'review_submitted') return '<div class="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>'
@@ -85,7 +95,7 @@ const handleSosToggle = async () => {
     return
   }
   if (!task.value) return
-  await toggleSos(task.value.id, task.value.sos_flag)
+  await toggleSos(task.value.id, task.value.sos_flag || false)
   await fetchTaskData()
   emit('refresh')
 }

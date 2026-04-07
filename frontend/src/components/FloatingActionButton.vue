@@ -1,4 +1,7 @@
-<script setup>
+<script setup lang="ts">
+defineEmits<{
+  (e: 'click'): void
+}>()
 </script>
 
 <template>

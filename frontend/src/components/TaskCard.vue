@@ -1,26 +1,36 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, useCssModule } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useLinearEffects } from '../composables/useLinearEffects'
+import type { Task, TaskStatus } from '../types'
 
 const $style = useCssModule()
 
-const props = defineProps({
-  task: { type: Object, required: true },
-  isLoading: { type: Boolean, default: false }
+interface Props {
+  task: Task
+  isLoading?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isLoading: false
 })
 
-const emit = defineEmits(['openDetail', 'action', 'delete'])
+const emit = defineEmits<{
+  (e: 'openDetail', task: Task): void
+  (e: 'action', payload: any): void
+  (e: 'delete', id: number): void
+}>()
 
-const { role: currentUserRole, customRoleId, isReviewer } = useAuth()
-const cardRef = ref(null)
+const { role: currentUserRole, customRoleId, isReviewer } = useAuth() as Record<string, any>
+
+const cardRef = ref<HTMLElement | null>(null)
 const { cardTransform, glowStyle, isHovered } = useLinearEffects(cardRef)
 
 const deadlineInfo = computed(() => {
   if (!props.task.due_date) return null
   const dueDate = new Date(props.task.due_date)
   const now = new Date()
-  const diffHours = (dueDate - now) / (1000 * 60 * 60)
+  const diffHours = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60)
   const status = props.task.status
 
   const isOverdue = dueDate < now && status !== 'completed'
@@ -38,9 +48,13 @@ const deadlineInfo = computed(() => {
 })
 
 const currentUserProps = computed(() => {
+  let parsedRoleId = null
+  if (customRoleId?.value && customRoleId.value !== 'null' && customRoleId.value !== 'undefined') {
+    parsedRoleId = parseInt(customRoleId.value)
+  }
   return {
-    role: currentUserRole.value,
-    custom_role_id: parseInt(customRoleId.value),
+    role: currentUserRole?.value,
+    custom_role_id: parsedRoleId,
     is_reviewer: isReviewer?.value || false 
   }
 })
@@ -59,14 +73,14 @@ const actionButton = computed(() => {
   const actionBtnLabel = status === 'pending' ? 'Start' : (status === 'in_progress' ? (currentUserProps.value.role === 'admin' ? 'Complete' : 'Submit Review') : 'Reopen')
   let cssClass = status === 'pending' ? $style.actionBtnBlue : (status === 'in_progress' ? $style.actionBtnGreen : $style.actionBtnYellow)
 
-  const isUnassigned = props.task.assigned_role_id === null
+  const isUnassigned = props.task.assigned_role_id === null || props.task.assigned_role_id === undefined
   const matchesRole = props.task.assigned_role_id === currentUserProps.value.custom_role_id
   const canEdit = currentUserProps.value.role === 'admin' || isUnassigned || matchesRole
 
   if (!canEdit) return { type: 'disabled', label: actionBtnLabel, cssClass: $style.actionBtnDisabled }
   if (status === 'in_progress' && currentUserProps.value.role !== 'admin') return { type: 'request_review', label: actionBtnLabel, cssClass }
 
-  const nextStatusMap = { 'pending': 'in_progress', 'in_progress': 'completed', 'completed': 'pending' }
+  const nextStatusMap: Record<string, TaskStatus> = { 'pending': 'in_progress', 'in_progress': 'completed', 'completed': 'pending' }
   return { type: 'update_status', label: actionBtnLabel, cssClass, nextStatus: nextStatusMap[status] }
 })
 </script>

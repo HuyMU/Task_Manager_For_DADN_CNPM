@@ -1,27 +1,44 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import TaskCard from './TaskCard.vue'
 import { useDragFlip } from '../composables/useDragFlip'
+import type { Task, TaskStatus } from '../types'
 
-const props = defineProps({
-  tasks: { type: Array, required: true },
-  actionLoadings: { type: Object, default: () => ({}) }
+interface Props {
+  tasks: Task[]
+  actionLoadings?: Record<number, boolean>
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  actionLoadings: () => ({})
 })
 
-const emit = defineEmits(['updateStatus', 'taskAction', 'openDetail', 'deleteTask'])
+const emit = defineEmits<{
+  (e: 'updateStatus', payload: { id: number; status: TaskStatus }): void
+  (e: 'taskAction', payload: any): void
+  (e: 'openDetail', task: Task): void
+  (e: 'deleteTask', id: number): void
+}>()
 
 const { onPointerDown } = useDragFlip()
 
-const columns = [
+interface Column {
+  id: TaskStatus
+  title: string
+  icon: string
+  colorClass: string
+}
+
+const columns: Column[] = [
   { id: 'pending', title: 'Pending', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', colorClass: 'text-text-primary' },
   { id: 'in_progress', title: 'In Progress', icon: 'M13 10V3L4 14h7v7l9-11h-7z', colorClass: 'text-indigo-600 dark:text-indigo-400' },
   { id: 'pending_review', title: 'Review', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', colorClass: 'text-fuchsia-600 dark:text-fuchsia-400' },
   { id: 'completed', title: 'Completed', icon: 'M5 13l4 4L19 7', colorClass: 'text-emerald-600 dark:text-emerald-400' }
 ]
 
-const getTasksByStatus = (status) => props.tasks.filter(t => t.status === status)
+const getTasksByStatus = (status: TaskStatus) => props.tasks.filter(t => t.status === status)
 
-const getTaskCount = (status) => getTasksByStatus(status).length
+const getTaskCount = (status: TaskStatus) => getTasksByStatus(status).length
 </script>
 
 <template>
@@ -54,7 +71,7 @@ const getTaskCount = (status) => getTasksByStatus(status).length
           :key="task.id" 
           :task="task" 
           :isLoading="props.actionLoadings && props.actionLoadings[task.id]"
-          @pointerdown.stop="(e) => onPointerDown(e, task, e.currentTarget)"
+          @pointerdown.stop="(e: PointerEvent) => onPointerDown(e, task, e.currentTarget as HTMLElement)"
           @openDetail="emit('openDetail', $event)"
           @action="emit('taskAction', $event)"
           @delete="emit('deleteTask', $event)"

@@ -1,10 +1,10 @@
-import { ref, computed } from 'vue'
+import { ref, computed, type Ref } from 'vue'
 import { useMouseInElement } from '@vueuse/core'
 
 /**
  * Creates a Linear-app style 3D tilt effect and cursor highlight glow
  */
-export function useLinearEffects(targetRef) {
+export function useLinearEffects(targetRef: Ref<HTMLElement | null>) {
   const { elementX, elementY, isOutside, elementHeight, elementWidth } = useMouseInElement(targetRef)
 
   // 3D Tilt calculation

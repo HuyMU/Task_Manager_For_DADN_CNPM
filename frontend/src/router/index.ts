@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
   { path: '/', redirect: '/dashboard' },
   { path: '/login', component: () => import('../views/Login.vue'), meta: { public: true } },
   { path: '/register', component: () => import('../views/Register.vue'), meta: { public: true } },

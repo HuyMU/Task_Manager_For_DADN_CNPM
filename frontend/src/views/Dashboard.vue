@@ -1,26 +1,27 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useTasks } from '../composables/useTasks'
 import KanbanBoard from '../components/KanbanBoard.vue'
 import TaskDetailModal from '../components/TaskDetailModal.vue'
 import FloatingActionButton from '../components/FloatingActionButton.vue'
+import type { CustomRole, Task } from '../types'
 
 const { tasks, fetchTasks, createTask, updateTaskStatus, submitReview, reviewTask, deleteTask, actionLoadings } = useTasks()
 const { role, api } = useAuth()
 
-const isCreateModalOpen = ref(false)
-const isDetailModalOpen = ref(false)
-const selectedTaskId = ref(null)
-const isCreating = ref(false)
+const isCreateModalOpen = ref<boolean>(false)
+const isDetailModalOpen = ref<boolean>(false)
+const selectedTaskId = ref<number | null>(null)
+const isCreating = ref<boolean>(false)
 
 const newTask = ref({
   title: '',
   description: '',
   due_date: '',
-  assigned_role_id: ''
+  assigned_role_id: '' as string | number
 })
-const roles = ref([])
+const roles = ref<CustomRole[]>([])
 
 const noRolesWarning = computed(() => role.value === 'admin' && roles.value.length === 0)
 
@@ -28,7 +29,7 @@ const loadDashboard = async () => {
   await fetchTasks()
   if (role.value === 'admin') {
     try {
-      const { data } = await api.get('/api/roles')
+      const { data } = await api.get<CustomRole[]>('/api/roles')
       roles.value = data
     } catch(e) {
       console.error(e)
@@ -38,7 +39,7 @@ const loadDashboard = async () => {
 
 onMounted(loadDashboard)
 
-const handleTaskAction = async (event) => {
+const handleTaskAction = async (event: any) => {
   if (event.action === 'update_status') {
     await updateTaskStatus(event.id, event.value)
   } else if (event.action === 'request_review') {
@@ -54,12 +55,12 @@ const handleTaskAction = async (event) => {
   }
 }
 
-const openDetail = (taskObj) => {
+const openDetail = (taskObj: Task) => {
   selectedTaskId.value = taskObj.id
   isDetailModalOpen.value = true
 }
 
-const handleDeleteTask = async (id) => {
+const handleDeleteTask = async (id: number) => {
   if(confirm("Are you sure you want to delete this task?")) {
     await deleteTask(id)
   }
@@ -72,11 +73,11 @@ const submitCreateTask = async () => {
       title: newTask.value.title,
       description: newTask.value.description,
       due_date: newTask.value.due_date ? new Date(newTask.value.due_date).toISOString() : null,
-      assigned_role_id: newTask.value.assigned_role_id || null
+      assigned_role_id: (newTask.value.assigned_role_id) ? parseInt(newTask.value.assigned_role_id.toString()) : null
     })
     isCreateModalOpen.value = false
     newTask.value = { title: '', description: '', due_date: '', assigned_role_id: '' }
-  } catch (err) {
+  } catch (err: any) {
     alert(err)
   } finally {
     isCreating.value = false
@@ -101,7 +102,7 @@ const submitCreateTask = async () => {
     <KanbanBoard 
       :tasks="tasks" 
       :actionLoadings="actionLoadings"
-      @update-status="({id, status}) => updateTaskStatus(id, status)"
+      @update-status="({id, status}: {id: number, status: any}) => updateTaskStatus(id, status)"
       @task-action="handleTaskAction"
       @open-detail="openDetail"
       @delete-task="handleDeleteTask"

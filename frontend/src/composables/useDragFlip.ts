@@ -1,19 +1,26 @@
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import { useTasks } from './useTasks'
+import type { Task, TaskStatus } from '../types'
+
+interface DraggingItem {
+  task: Task
+  el: HTMLElement
+  rect: DOMRect
+}
 
 export function useDragFlip() {
   const { tasks } = useTasks()
-  const draggingItem = ref(null)
-  const pointerPos = ref({ x: 0, y: 0 })
+  const draggingItem = ref<DraggingItem | null>(null)
   const offset = ref({ x: 0, y: 0 })
-  const cloneEl = ref(null)
+  const cloneEl = ref<HTMLElement | null>(null)
   
   // Track origin to prevent cross-column moves
-  const originalColumnStatus = ref(null)
+  const originalColumnStatus = ref<TaskStatus | null>(null)
 
-  const onPointerDown = (e, task, el) => {
+  const onPointerDown = (e: PointerEvent, task: Task, el: HTMLElement) => {
     if (e.button !== 0) return
-    if (e.target.closest('button')) return
+    const target = e.target as HTMLElement
+    if (target.closest('button')) return
 
     const rect = el.getBoundingClientRect()
     offset.value = {
@@ -21,7 +28,7 @@ export function useDragFlip() {
       y: e.clientY - rect.top
     }
     
-    cloneEl.value = el.cloneNode(true)
+    cloneEl.value = el.cloneNode(true) as HTMLElement
     cloneEl.value.style.position = 'fixed'
     cloneEl.value.style.left = `${rect.left}px`
     cloneEl.value.style.top = `${rect.top}px`
@@ -46,7 +53,7 @@ export function useDragFlip() {
     document.body.style.cursor = 'grabbing'
   }
 
-  const onPointerMove = (e) => {
+  const onPointerMove = (e: PointerEvent) => {
     if (!cloneEl.value || !draggingItem.value) return
     const x = e.clientX - offset.value.x
     const y = e.clientY - offset.value.y
@@ -56,10 +63,10 @@ export function useDragFlip() {
     const { task } = draggingItem.value
     
     const elementsBeneath = document.elementsFromPoint(e.clientX, e.clientY)
-    const taskCardElement = elementsBeneath.find(el => el.classList.contains('task-card') && el !== draggingItem.value.el)
+    const taskCardElement = elementsBeneath.find(el => el.classList.contains('task-card') && el !== draggingItem.value!.el)
     
     if (taskCardElement) {
-      const hoverTaskId = parseInt(taskCardElement.getAttribute('data-id'))
+      const hoverTaskId = parseInt(taskCardElement.getAttribute('data-id') || '')
       
       if (!isNaN(hoverTaskId)) {
         const currentIndex = tasks.value.findIndex(t => t.id === task.id)
@@ -93,7 +100,7 @@ export function useDragFlip() {
     }
   }
 
-  const onPointerUp = (e) => {
+  const onPointerUp = (e: PointerEvent) => {
     document.removeEventListener('pointermove', onPointerMove)
     document.removeEventListener('pointerup', onPointerUp)
     document.body.style.cursor = ''

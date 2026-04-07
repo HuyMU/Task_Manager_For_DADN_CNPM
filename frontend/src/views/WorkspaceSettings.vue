@@ -1,18 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
+import type { CustomRole, User } from '../types'
 
 const { api } = useAuth()
-const roles = ref([])
-const users = ref([])
-const newRoleName = ref('')
-const loadingRole = ref(false)
+const roles = ref<CustomRole[]>([])
+const users = ref<any[]>([])
+const newRoleName = ref<string>('')
+const loadingRole = ref<boolean>(false)
 
 const loadData = async () => {
   try {
-    const rolesRes = await api.get('/api/roles')
+    const rolesRes = await api.get<CustomRole[]>('/api/roles')
     roles.value = rolesRes.data
-    const usersRes = await api.get('/api/users')
+    const usersRes = await api.get<any[]>('/api/users')
     users.value = usersRes.data
   } catch(e) {
     console.error(e)
@@ -28,14 +29,14 @@ const handleAddRole = async () => {
     await api.post('/api/roles', { name: newRoleName.value })
     newRoleName.value = ''
     await loadData()
-  } catch(e) {
+  } catch(e: any) {
     alert(e.response?.data?.error || 'Failed to create role')
   } finally {
     loadingRole.value = false
   }
 }
 
-const toggleReviewer = async (id, isReviewer) => {
+const toggleReviewer = async (id: number, isReviewer: boolean) => {
   try {
     await api.put(`/api/users/${id}/reviewer`, { is_reviewer: isReviewer })
     await loadData()
@@ -77,7 +78,7 @@ const toggleReviewer = async (id, isReviewer) => {
             <span class="text-[10px] text-text-muted uppercase tracking-wide truncate">{{ u.custom_role_name || 'No Role' }}</span>
           </div>
           <label class="relative inline-flex items-center cursor-pointer shrink-0">
-            <input type="checkbox" class="sr-only peer" :checked="u.is_reviewer" @change="toggleReviewer(u.id, $event.target.checked)">
+            <input type="checkbox" class="sr-only peer" :checked="u.is_reviewer" @change="toggleReviewer(u.id, ($event.target as HTMLInputElement).checked)">
             <div class="w-7 h-4 bg-slate-200 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 dark:after:border-slate-500 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-500"></div>
           </label>
         </div>

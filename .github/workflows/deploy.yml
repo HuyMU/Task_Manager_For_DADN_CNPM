@@ -25,6 +25,7 @@ jobs:
         run: |
           cd frontend
           npm install
+          npm run typecheck
           npm run build
 
       - name: Set up Python 3.11

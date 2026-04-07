@@ -1,12 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 
-const username = ref('')
-const password = ref('')
-const errorMsg = ref('')
-const loading = ref(false)
+const username = ref<string>('')
+const password = ref<string>('')
+const errorMsg = ref<string>('')
+const loading = ref<boolean>(false)
 const router = useRouter()
 const { login } = useAuth()
 
@@ -16,7 +16,7 @@ const handleSubmit = async () => {
   try {
     await login({ username: username.value, password: password.value })
     router.push('/dashboard')
-  } catch (err) {
+  } catch (err: any) {
     errorMsg.value = err
   } finally {
     loading.value = false
